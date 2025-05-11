@@ -69,52 +69,77 @@ function App() {
 
   return (
     <>
-      <div style={{ position: 'absolute', zIndex: 10, left: 10, top: 10, background: 'white', padding: 8, borderRadius: 8 }}>
-        <label htmlFor="jinshu-select">人種（国・地域）を選択：</label>
-        <select
-          id="jinshu-select"
-          value={selectedJinshu}
-          onChange={e => setSelectedJinshu(e.target.value)}
-        >
-          {JINSHU_LIST.map(j => (
-            <option key={j} value={j}>{j}</option>
-          ))}
-        </select>
+      <label htmlFor="jinshu-select">人種（国・地域）を選択：</label>
+      <select
+        id="jinshu-select"
+        value={selectedJinshu}
+        onChange={e => setSelectedJinshu(e.target.value)}
+      >
+        {JINSHU_LIST.map(j => (
+          <option key={j} value={j}>{j}</option>
+        ))}
+      </select>
+      <div style={{ background: 'white', padding: 8, borderRadius: 8, marginBottom: 8, width: '80vw', height: '60vh' }}>
+        <GoogleMap mapContainerStyle={{ width: '100%', height: '100%' }} center={center} zoom={11}>
+          {data.map((row, idx) => {
+            const name = row['国・地域(人)'];
+            const latlng = kuLatLng[name];
+            if (!latlng) return null;
+            const populationStr = String(row[selectedJinshu] || '').replace(/,/g, '');
+            const population = Number(populationStr || 0);
+            let color = 'skyblue'; // 薄い青色
+            // 4桁以下:32px, 5桁:40px, 6桁以上:48px
+            let diameter = 32;
+            if (population >= 15000) {
+              color = 'red';
+              diameter = 56;
+            } else if (population >= 10000) {
+              color = 'orange';
+              diameter = 48;
+            } else if (population >= 5000) {
+              color = 'yellow';
+              diameter = 40;
+            }
+
+            // フォントサイズも調整
+            const fontSize = Math.max(14, Math.floor(diameter * 0.45)) * 0.5;
+
+            const icon = {
+              url: `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${diameter}' height='${diameter}'><circle cx='${diameter/2}' cy='${diameter/2}' r='${diameter/2-4}' fill='${color}' stroke='black' stroke-width='2'/></svg>`,
+              scaledSize: new window.google.maps.Size(diameter, diameter)
+            };
+
+            return (
+              <Marker
+                key={idx}
+                position={latlng}
+                onClick={() => {
+                  const sel = { row, latlng };
+                  setSelected(sel);
+                }}
+                label={{
+                  text: row[selectedJinshu] ? String(row[selectedJinshu]) : '',
+                  color: 'black',
+                  fontSize: fontSize + 'px',
+                  fontWeight: 'bold',
+                }}
+                icon={icon}
+              />
+            );
+          })}
+          {selected && selected.latlng && selected.row && (
+            <InfoWindow
+              position={selected.latlng}
+              onCloseClick={() => setSelected(null)}
+            >
+              <div>
+                <h3>{selected.row['国・地域(人)']}</h3>
+                <p>{selectedJinshu}：{selected.row[selectedJinshu]}</p>
+              </div>
+            </InfoWindow>
+          )}
+        </GoogleMap>
       </div>
-      <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={11}>
-        {data.map((row, idx) => {
-          const name = row['国・地域(人)'];
-          const latlng = kuLatLng[name];
-          if (!latlng) return null;
-          return (
-            <Marker
-              key={idx}
-              position={latlng}
-              onClick={() => {
-                const sel = { row, latlng };
-                setSelected(sel);
-              }}
-              label={{
-                text: row[selectedJinshu] ? String(row[selectedJinshu]) : '',
-                color: 'black',
-                fontSize: '14px',
-                fontWeight: 'bold',
-              }}
-            />
-          );
-        })}
-        {selected && selected.latlng && selected.row && (
-          <InfoWindow
-            position={selected.latlng}
-            onCloseClick={() => setSelected(null)}
-          >
-            <div>
-              <h3>{selected.row['国・地域(人)']}</h3>
-              <p>{selectedJinshu}：{selected.row[selectedJinshu]}</p>
-            </div>
-          </InfoWindow>
-        )}
-      </GoogleMap>
     </>
   );
 }
