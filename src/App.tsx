@@ -3,8 +3,9 @@ import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-map
 import Papa from 'papaparse';
 import './App.css';
 
-const API_KEY = 'AIzaSyCThqlEatId4dqpuzYSHAWQTRF2mecCpEs';
-const CSV_PATH = '/tokyo_foreign_population.csv';
+const apiKey = import.meta.env.VITE_API_KEY ?? "";
+const csvPath = import.meta.env.VITE_CSV_PATH ?? "";
+console.log(apiKey)
 const mapContainerStyle = { width: '100vw', height: '100vh' };
 const center = { lat: 35.6895, lng: 139.6917 };
 
@@ -41,14 +42,14 @@ const JINSHU_LIST = [
 
 function App() {
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: API_KEY,
+    googleMapsApiKey: apiKey,
   });
   const [data, setData] = useState<any[]>([]);
   const [selected, setSelected] = useState<any | null>(null);
   const [selectedJinshu, setSelectedJinshu] = useState<string>('中国');
 
   useEffect(() => {
-    fetch(CSV_PATH)
+    fetch(csvPath)
       .then((res) => res.text())
       .then((text) => {
         Papa.parse(text, {
@@ -69,74 +70,52 @@ function App() {
 
   return (
     <>
-      <label htmlFor="jinshu-select">人種（国・地域）を選択：</label>
-      <select
-        id="jinshu-select"
-        value={selectedJinshu}
-        onChange={e => setSelectedJinshu(e.target.value)}
-      >
-        {JINSHU_LIST.map(j => (
-          <option key={j} value={j}>{j}</option>
-        ))}
-      </select>
-      <div style={{ background: 'white', padding: 8, borderRadius: 8, marginBottom: 8, width: '80vw', height: '60vh' }}>
-        <GoogleMap mapContainerStyle={{ width: '100%', height: '100%' }} center={center} zoom={11}>
-          {data.map((row, idx) => {
-            const name = row['国・地域(人)'];
-            const latlng = kuLatLng[name];
-            if (!latlng) return null;
-            const populationStr = String(row[selectedJinshu] || '').replace(/,/g, '');
-            const population = Number(populationStr || 0);
-            let color = 'skyblue'; // 薄い青色
-            if (population >= 15000) color = 'red';
-            else if (population >= 10000) color = 'orange';
-            else if (population >= 5000) color = 'yellow';
-
-            // 桁数に応じてピンの直径を決定
-            const digit = populationStr.length;
-            // 4桁以下:32px, 5桁:40px, 6桁以上:48px
-            let diameter = 32;
-            if (digit === 5) diameter = 40;
-            else if (digit >= 6) diameter = 48;
-            // フォントサイズも調整
-            const fontSize = Math.max(14, Math.floor(diameter * 0.45)) * 0.5;
-
-            const icon = {
-              url: `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${diameter}' height='${diameter}'><circle cx='${diameter/2}' cy='${diameter/2}' r='${diameter/2-4}' fill='${color}' stroke='black' stroke-width='2'/></svg>`,
-              scaledSize: new window.google.maps.Size(diameter, diameter)
-            };
-
-            return (
-              <Marker
-                key={idx}
-                position={latlng}
-                onClick={() => {
-                  const sel = { row, latlng };
-                  setSelected(sel);
-                }}
-                label={{
-                  text: row[selectedJinshu] ? String(row[selectedJinshu]) : '',
-                  color: 'black',
-                  fontSize: fontSize + 'px',
-                  fontWeight: 'bold',
-                }}
-                icon={icon}
-              />
-            );
-          })}
-          {selected && selected.latlng && selected.row && (
-            <InfoWindow
-              position={selected.latlng}
-              onCloseClick={() => setSelected(null)}
-            >
-              <div>
-                <h3>{selected.row['国・地域(人)']}</h3>
-                <p>{selectedJinshu}：{selected.row[selectedJinshu]}</p>
-              </div>
-            </InfoWindow>
-          )}
-        </GoogleMap>
+      <div style={{ position: 'absolute', zIndex: 10, left: 10, top: 10, background: 'white', padding: 8, borderRadius: 8 }}>
+        <label htmlFor="jinshu-select">人種（国・地域）を選択：</label>
+        <select
+          id="jinshu-select"
+          value={selectedJinshu}
+          onChange={e => setSelectedJinshu(e.target.value)}
+        >
+          {JINSHU_LIST.map(j => (
+            <option key={j} value={j}>{j}</option>
+          ))}
+        </select>
       </div>
+      <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={11}>
+        {data.map((row, idx) => {
+          const name = row['国・地域(人)'];
+          const latlng = kuLatLng[name];
+          if (!latlng) return null;
+          return (
+            <Marker
+              key={idx}
+              position={latlng}
+              onClick={() => {
+                const sel = { row, latlng };
+                setSelected(sel);
+              }}
+              label={{
+                text: row[selectedJinshu] ? String(row[selectedJinshu]) : '',
+                color: 'black',
+                fontSize: '14px',
+                fontWeight: 'bold',
+              }}
+            />
+          );
+        })}
+        {selected && selected.latlng && selected.row && (
+          <InfoWindow
+            position={selected.latlng}
+            onCloseClick={() => setSelected(null)}
+          >
+            <div>
+              <h3>{selected.row['国・地域(人)']}</h3>
+              <p>{selectedJinshu}：{selected.row[selectedJinshu]}</p>
+            </div>
+          </InfoWindow>
+        )}
+      </GoogleMap>
     </>
   );
 }
