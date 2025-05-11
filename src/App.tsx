@@ -5,7 +5,6 @@ import './App.css';
 
 const apiKey = import.meta.env.VITE_API_KEY ?? "";
 const csvPath = import.meta.env.VITE_CSV_PATH ?? "";
-console.log(apiKey)
 const mapContainerStyle = { width: '100vw', height: '100vh' };
 const center = { lat: 35.6895, lng: 139.6917 };
 
