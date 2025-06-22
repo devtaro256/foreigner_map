@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://foreign-population-map.vercel.app/sitemap.xml
+
+# 検索エンジンに優先的にクロールしてもらうページ
+Allow: /
+
+# 除外するページ
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# クローリング頻度の調整
+Crawl-delay: 1 
