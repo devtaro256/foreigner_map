@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import GoogleMapComponent from './components/GoogleMap';
 import LoadingSpinner from './components/LoadingSpinner';
-import StaticInfoPanel from './components/StaticInfoPanel';
 import { Metadata } from 'next';
 import { loadCsvDataServer } from '@/lib/serverCsvLoader';
 import { PopulationData } from '@/types';
@@ -69,17 +68,10 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* 事前計算された統計情報（SSRで配信） */}
-        {populationData.length > 0 && (
-          <div className="mb-6">
-            <StaticInfoPanel data={populationData} selectedJinshu="中国" />
-          </div>
-        )}
-
         {/* 地図コンポーネント（クライアントコンポーネント） */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <Suspense fallback={<LoadingSpinner />}>
-            <GoogleMapComponent />
+            <GoogleMapComponent initialData={populationData} />
           </Suspense>
         </div>
 

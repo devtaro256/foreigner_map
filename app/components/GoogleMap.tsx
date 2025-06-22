@@ -13,6 +13,7 @@ import {
 import { loadCsvData, parsePopulationNumber, formatPopulation } from '@/lib/csvLoader';
 import DataSelector from './DataSelector';
 import InfoPanel from './InfoPanel';
+import StaticInfoPanel from './StaticInfoPanel';
 import LoadingSpinner, { MapSkeleton } from './LoadingSpinner';
 
 const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || '';
@@ -28,15 +29,19 @@ const mapOptions: google.maps.MapOptions = {
   fullscreenControl: true,
 };
 
-export default function GoogleMapComponent() {
+interface GoogleMapComponentProps {
+  initialData?: PopulationData[];
+}
+
+export default function GoogleMapComponent({ initialData = [] }: GoogleMapComponentProps) {
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: API_KEY,
   });
 
-  const [data, setData] = useState<PopulationData[]>([]);
+  const [data, setData] = useState<PopulationData[]>(initialData);
   const [selectedInfo, setSelectedInfo] = useState<SelectedInfo | null>(null);
   const [selectedJinshu, setSelectedJinshu] = useState<JinshuType>('中国');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!initialData.length);
   const [error, setError] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(11);
 
@@ -52,8 +57,14 @@ export default function GoogleMapComponent() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // CSVデータの読み込み
+  // CSVデータの読み込み（initialDataがない場合のみ）
   useEffect(() => {
+    if (initialData.length > 0) {
+      setData(initialData);
+      setLoading(false);
+      return;
+    }
+
     const loadData = async () => {
       try {
         setLoading(true);
@@ -69,7 +80,7 @@ export default function GoogleMapComponent() {
     };
 
     loadData();
-  }, []);
+  }, [initialData]);
 
   // マーカークリック時の処理
   const handleMarkerClick = useCallback((row: PopulationData) => {
@@ -145,6 +156,16 @@ export default function GoogleMapComponent() {
         selectedJinshu={selectedJinshu}
         onJinshuChange={handleJinshuChange}
       />
+
+      {/* 統計情報パネル */}
+      {data.length > 0 && (
+        <div className="mb-6">
+          <StaticInfoPanel 
+            data={data} 
+            selectedJinshu={selectedJinshu}
+          />
+        </div>
+      )}
 
       {/* 地図セクション */}
       <div className="p-6 pt-0">
