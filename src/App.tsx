@@ -5,7 +5,7 @@ import './App.css';
 
 const apiKey = import.meta.env.VITE_API_KEY ?? "";
 const csvPath = import.meta.env.VITE_CSV_PATH ?? "";
-const mapContainerStyle = { width: '100vw', height: '100vh' };
+// const mapContainerStyle = { width: '100vw', height: '100vh' };
 const center = { lat: 35.6895, lng: 139.6917 };
 
 // 区名→緯度経度マッピング（主要区のみ例示、必要に応じて追加）
