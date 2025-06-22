@@ -1,8 +1,13 @@
+next.jsを公開する
 google analyticsを使えるようにしてアクセス数をわかるようにする
 広告を貼る
 
 優先度低
-英語版
+英語版を作成する
+区ごとで区切る
 
 アクセス数を増やす方法
 政治家批判してる人のツイートにリプする
+
+
+https://immigrant-map.com/index.html
