@@ -6,6 +6,7 @@ import { generateStructuredData } from '@/lib/metadata';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://foreign-population-map.vercel.app'),
   title: '東京都外国人人口マップ | 区別・国籍別データ可視化',
   description: '東京都23区の外国人人口を国籍別に地図上で可視化。最新の統計データに基づく人口分布を直感的に確認できます。',
   keywords: ['東京都', '外国人人口', '人口統計', '地図', '可視化', '23区', '国籍別', 'データ分析'],
@@ -45,11 +46,6 @@ export const metadata: Metadata = {
     description: '東京都23区の外国人人口を国籍別に地図上で可視化。',
     images: ['/og-image.png'],
     creator: '@foreign_pop_map',
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
   },
   icons: {
     icon: '/favicon.ico',

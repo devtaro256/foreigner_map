@@ -77,7 +77,7 @@ npm run dev
 
 http://localhost:3000 でアプリケーションが起動します。
 
-## �� ビルドとデプロイ
+## 📦 ビルドとデプロイ
 
 ### 本番用ビルド
 
@@ -86,12 +86,41 @@ npm run build
 npm start
 ```
 
+### 静的サイト生成（SSG）
+
+このアプリケーションはSSG（Static Site Generation）に対応しており、静的ファイルとしてデプロイ可能です：
+
+```bash
+# SSG用ビルド
+npm run build
+
+# 静的ファイルが`out`ディレクトリに生成されます
+# 任意のWebサーバーでホスティング可能
+```
+
+生成された`out`ディレクトリには以下が含まれます：
+- `index.html` - メインページ
+- `sitemap.xml` - サイトマップ
+- `data/` - CSVデータファイル
+- `_next/` - Next.jsのアセット
+
+### 静的ホスティング
+
+生成された静的ファイルは以下のサービスでホスティング可能です：
+- GitHub Pages
+- Netlify
+- Vercel（静的モード）
+- AWS S3 + CloudFront
+- その他の静的ホスティングサービス
+
 ### Vercelでのデプロイ
 
 1. [Vercel](https://vercel.com) アカウントを作成
 2. GitHubリポジトリを接続
 3. 環境変数`NEXT_PUBLIC_GOOGLE_MAPS_API_KEY`を設定
 4. デプロイ実行
+
+**注意**: SSGモードでは環境変数はビルド時に埋め込まれるため、公開されるAPIキーには適切な制限を設定してください。
 
 ## 🎯 パフォーマンス
 
