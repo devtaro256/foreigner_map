@@ -3,6 +3,7 @@
 import React from 'react';
 import Autocomplete, { AutocompleteRenderInputParams } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
+import { trackNationalitySelection } from '@/lib/gtag';
 
 interface DataSelectorProps {
   selectedJinshu: string;
@@ -18,6 +19,8 @@ export default function DataSelector({
   jinshuList,
 }: DataSelectorProps) {
   const handleChange = (value:string|null) => {
+    // Google Analyticsでトラッキング
+    trackNationalitySelection(value??"");
     onJinshuChange(value??"");
   };
 

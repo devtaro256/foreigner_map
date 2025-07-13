@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { generateStructuredData } from '@/lib/metadata';
-
+import { GA_TRACKING_ID } from '@/lib/gtag';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://foreign-population-map.vercel.app'),
@@ -63,6 +63,28 @@ export default function RootLayout({
   return (
     <html lang="ja" className="h-full">
       <head>
+        {/* Google Analytics */}
+        {GA_TRACKING_ID && (
+          <>
+            <script
+              async
+              src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+            />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${GA_TRACKING_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+        
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
