@@ -11,6 +11,7 @@ const nextConfig = {
   },
   env: {
     NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    NEXT_PUBLIC_GA_ID: process.env.NEXT_PUBLIC_GA_ID,
   },
   // SSGではheadersは動作しないため削除
   // Sitemap生成
