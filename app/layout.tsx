@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { generateStructuredData } from '@/lib/metadata';
 
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://foreign-population-map.vercel.app'),
@@ -72,7 +70,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${inter.className} h-full bg-white text-gray-900 antialiased`}>
+      <body className={`h-full bg-white text-gray-900 antialiased`}>
         <div className="min-h-full">
           <header className="bg-white shadow-sm border-b border-gray-200">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
