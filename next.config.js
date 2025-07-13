@@ -4,7 +4,7 @@ const nextConfig = {
   output: 'export',
   trailingSlash: true,
   // ファイルシステムから直接開けるように相対パスを使用（本番ビルド時は除外）
-  assetPrefix: process.env.NODE_ENV === 'production' ? '' : './',
+  assetPrefix: '/',
   // 画像最適化を無効化（SSGでは対応していないため）
   images: {
     unoptimized: true,

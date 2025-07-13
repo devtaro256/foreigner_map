@@ -3,6 +3,7 @@
 import React from 'react';
 import { JinshuType } from '@/types';
 import { JINSHU_LIST } from '@/lib/mapUtils';
+import { trackNationalitySelection } from '@/lib/gtag';
 
 interface DataSelectorProps {
   selectedJinshu: JinshuType;
@@ -16,7 +17,12 @@ export default function DataSelector({
   className = "" 
 }: DataSelectorProps) {
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onJinshuChange(event.target.value as JinshuType);
+    const selectedValue = event.target.value as JinshuType;
+    
+    // Google Analyticsでトラッキング
+    trackNationalitySelection(selectedValue);
+    
+    onJinshuChange(selectedValue);
   };
 
   return (
