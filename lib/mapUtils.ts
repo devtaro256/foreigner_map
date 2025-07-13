@@ -1,4 +1,4 @@
-import { LatLng, KuLatLngMapping, MarkerStyle, JinshuType } from '@/types';
+import { LatLng, KuLatLngMapping, MarkerStyle,  } from '@/types';
 
 // 区名→緯度経度マッピング
 export const kuLatLng: KuLatLngMapping = {
@@ -26,13 +26,6 @@ export const kuLatLng: KuLatLngMapping = {
   "葛飾区": { lat: 35.7434, lng: 139.8477 },
   "江戸川区": { lat: 35.7064, lng: 139.8680 },
 };
-
-// 対応する国・地域リスト
-export const JINSHU_LIST: JinshuType[] = [
-  '中国', '韓国', 'ベトナム', 'ネパール', 'フィリピン', 
-  'ミャンマー', '台湾', '米国', 'インド', 'インドネシア', 'その他'
-];
-
 // 東京の中心座標
 export const TOKYO_CENTER: LatLng = { 
   lat: 35.6895, 

@@ -1,22 +1,24 @@
 'use client';
 
 import React from 'react';
-import { JinshuType } from '@/types';
-import { JINSHU_LIST } from '@/lib/mapUtils';
+import Autocomplete, { AutocompleteRenderInputParams } from '@mui/material/Autocomplete';
+import TextField from '@mui/material/TextField';
 
 interface DataSelectorProps {
-  selectedJinshu: JinshuType;
-  onJinshuChange: (jinshu: JinshuType) => void;
+  selectedJinshu: string;
+  onJinshuChange: (jinshu: string) => void;
   className?: string;
+  jinshuList:string[]
 }
 
 export default function DataSelector({ 
   selectedJinshu, 
   onJinshuChange, 
-  className = "" 
+  className = "" ,
+  jinshuList,
 }: DataSelectorProps) {
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    onJinshuChange(event.target.value as JinshuType);
+  const handleChange = (value:string|null) => {
+    onJinshuChange(value??"");
   };
 
   return (
@@ -29,19 +31,14 @@ export default function DataSelector({
           >
             表示する国籍・地域を選択
           </label>
-          <select
-            id="jinshu-select"
+          <Autocomplete
             value={selectedJinshu}
-            onChange={handleChange}
-            className="custom-select max-w-xs"
-            aria-describedby="jinshu-description"
-          >
-            {JINSHU_LIST.map((jinshu) => (
-              <option key={jinshu} value={jinshu}>
-                {jinshu}
-              </option>
-            ))}
-          </select>
+            onChange={(_, value) => handleChange(value)}
+            options={jinshuList}
+            className="max-w-xs"
+            aria-describedby="jinshu-description" 
+            renderInput={(params) => <TextField {...params} label="国籍" />}
+            />
         </div>
         
         <div className="text-sm text-gray-600">

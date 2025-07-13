@@ -1,17 +1,17 @@
 import React from 'react';
-import { PopulationData, JinshuType } from '@/types';
+import { PopulationData } from '@/types';
 import { parsePopulationNumber, formatPopulation } from '@/lib/csvLoader';
 
 interface StaticInfoPanelProps {
   data: PopulationData[];
-  selectedJinshu?: JinshuType;
+  selectedJinshu?: string;
   className?: string;
 }
 
 // サーバーサイドで事前計算された統計情報を表示するコンポーネント
 export default function StaticInfoPanel({ 
   data, 
-  selectedJinshu = '中国',
+  selectedJinshu = 'アジア',
   className = "" 
 }: StaticInfoPanelProps) {
   // 総人口を計算

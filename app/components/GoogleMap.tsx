@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
-import { PopulationData, SelectedInfo, JinshuType } from '@/types';
+import { PopulationData, SelectedInfo, } from '@/types';
 import { 
   kuLatLng, 
   TOKYO_CENTER, 
@@ -40,10 +40,19 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
 
   const [data, setData] = useState<PopulationData[]>(initialData);
   const [selectedInfo, setSelectedInfo] = useState<SelectedInfo | null>(null);
-  const [selectedJinshu, setSelectedJinshu] = useState<JinshuType>('中国');
+  const [selectedJinshu, setSelectedJinshu] = useState<string>('中国');
   const [loading, setLoading] = useState(!initialData.length);
   const [error, setError] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(11);
+  
+  const jinshuList:string[] = []
+  Object.keys(data[0]).forEach((v)=>{
+    if(!["国・地域(人)","地域コード", "地域階層" ,"女","男"].includes(v)){
+      jinshuList.push(v)
+    }
+  })
+
+  console.log(data)
 
   // 画面サイズに応じたズームレベルの調整
   useEffect(() => {
@@ -98,7 +107,7 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
   }, []);
 
   // 国籍変更時の処理
-  const handleJinshuChange = useCallback((jinshu: JinshuType) => {
+  const handleJinshuChange = useCallback((jinshu: string) => {
     setSelectedJinshu(jinshu);
     setSelectedInfo(null); // 選択をリセット
   }, []);
@@ -155,6 +164,7 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
       <DataSelector
         selectedJinshu={selectedJinshu}
         onJinshuChange={handleJinshuChange}
+        jinshuList={jinshuList}
       />
 
       {/* 統計情報パネル */}

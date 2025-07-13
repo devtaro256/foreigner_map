@@ -1,12 +1,12 @@
 'use client';
 
 import React from 'react';
-import { PopulationData, SelectedInfo, JinshuType } from '@/types';
+import { PopulationData, SelectedInfo } from '@/types';
 import { formatPopulation, parsePopulationNumber } from '@/lib/csvLoader';
 
 interface InfoPanelProps {
   selectedInfo: SelectedInfo | null;
-  selectedJinshu: JinshuType;
+  selectedJinshu: string;
   data: PopulationData[];
   className?: string;
 }
@@ -17,6 +17,10 @@ export default function InfoPanel({
   data, 
   className = "" 
 }: InfoPanelProps) {
+  console.log(selectedJinshu)
+    if(!selectedJinshu ||selectedJinshu =="" ) { 
+      selectedJinshu="総数";
+    }
   // 選択されている国籍の総人口を計算
   const totalPopulation = React.useMemo(() => {
     if (!data.length) return 0;
@@ -31,7 +35,7 @@ export default function InfoPanel({
     <div className={`bg-white border-t border-gray-200 ${className}`}>
       <div className="p-6">
         {/* 選択されたマーカーの詳細情報 */}
-        {selectedInfo ? (
+        {selectedInfo?.row['国・地域(人)'] ? (
           <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <h3 className="text-lg font-semibold text-blue-900 mb-2">
               {selectedInfo.row['国・地域(人)']}
