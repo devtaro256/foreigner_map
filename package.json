@@ -5,8 +5,8 @@
   "scripts": {
     "dev": "NODE_ENV=development next dev",
     "build": "next build",
-    "build:development": "NODE_ENV=development next build",
-    "build:production": "NODE_ENV=production next build",
+    "build:dev": "NODE_ENV=development next build",
+    "build:pro": "NODE_ENV=production next build",
     "build:ssg": "next build",
     "start": "next start",
     "lint": "next lint",
