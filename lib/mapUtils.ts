@@ -38,17 +38,17 @@ export const TOKYO_CENTER: LatLng = {
  * @returns MarkerStyle
  */
 export function getMarkerStyle(population: number): MarkerStyle {
-  let color = 'skyblue';
+  let color = '#87CEEB'; // パステルスカイブルー
   let diameter = 32;
 
   if (population >= 15000) {
-    color = 'red';
+    color = '#FFB6C1'; // パステルピンク（ライトピンク）
     diameter = 56;
   } else if (population >= 10000) {
-    color = 'orange';
+    color = '#FFD700'; // パステルゴールド（ライトゴールド）
     diameter = 48;
   } else if (population >= 5000) {
-    color = 'yellow';
+    color = '#98FB98'; // パステルグリーン（ライトグリーン）
     diameter = 40;
   }
 
@@ -65,10 +65,50 @@ export function getMarkerStyle(population: number): MarkerStyle {
 export function createMarkerIcon(style: MarkerStyle): google.maps.Icon {
   const { color, diameter } = style;
   
+  // パステルカラーに合わせて境界線の色も調整
+  const strokeColor = color === '#FFB6C1' ? '#FF69B4' : // パステルピンクの境界線
+                      color === '#FFD700' ? '#DAA520' : // パステルゴールドの境界線
+                      color === '#98FB98' ? '#32CD32' : // パステルグリーンの境界線
+                      '#4682B4'; // パステルスカイブルーの境界線
+  
+  // 直径に応じて境界線の太さを調整
+  const strokeWidth = diameter >= 50 ? 3 : diameter >= 40 ? 2.5 : 2;
+  const radius = diameter / 2 - strokeWidth;
+  
+  // より詳細なSVGアイコンを生成（ドロップシャドウ効果付き）
+  const svgContent = `
+    <svg xmlns='http://www.w3.org/2000/svg' width='${diameter}' height='${diameter}' viewBox='0 0 ${diameter} ${diameter}'>
+      <defs>
+        <filter id='shadow' x='-50%' y='-50%' width='200%' height='200%'>
+          <feDropShadow dx='1' dy='1' stdDeviation='1' flood-color='rgba(0,0,0,0.2)'/>
+        </filter>
+      </defs>
+      <circle 
+        cx='${diameter/2}' 
+        cy='${diameter/2}' 
+        r='${radius}' 
+        fill='${color}' 
+        stroke='${strokeColor}' 
+        stroke-width='${strokeWidth}'
+        filter='url(#shadow)'
+        opacity='0.9'
+      />
+    </svg>
+  `;
+  
   return {
-    url: `data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='${diameter}' height='${diameter}'><circle cx='${diameter/2}' cy='${diameter/2}' r='${diameter/2-4}' fill='${color}' stroke='black' stroke-width='2'/></svg>`,
+    url: `data:image/svg+xml;utf8,${encodeURIComponent(svgContent)}`,
     scaledSize: new window.google.maps.Size(diameter, diameter)
   };
+}
+
+/**
+ * 人口数をフォーマット（カンマ区切り）
+ * @param population 人口数
+ * @returns フォーマットされた人口数文字列
+ */
+export function formatPopulation(population: number): string {
+  return population.toLocaleString();
 }
 
 /**

@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { GoogleMap, Marker, InfoWindow, useJsApiLoader } from '@react-google-maps/api';
-import { PopulationData, SelectedInfo, } from '@/types';
+import { PopulationData, SelectedInfo } from '@/types';
 import { 
   kuLatLng, 
   TOKYO_CENTER, 
   getMarkerStyle, 
   createMarkerIcon,
-  calculateZoomLevel 
+  calculateZoomLevel
 } from '@/lib/mapUtils';
 import { loadCsvData, parsePopulationNumber, formatPopulation } from '@/lib/csvLoader';
 import DataSelector from './DataSelector';
@@ -27,6 +27,8 @@ const mapOptions: google.maps.MapOptions = {
   mapTypeControl: true,
   streetViewControl: true,
   fullscreenControl: true,
+  // 境界表示機能を使用するためのMap ID（後で設定が必要）
+  mapId: process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || 'DEMO_MAP_ID',
 };
 
 interface GoogleMapComponentProps {
@@ -44,13 +46,13 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
   const [loading, setLoading] = useState(!initialData.length);
   const [error, setError] = useState<string | null>(null);
   const [zoomLevel, setZoomLevel] = useState(11);
+  const [showBoundaries, setShowBoundaries] = useState<boolean>(true);
+  const [map, setMap] = useState<google.maps.Map | null>(null);
   
-  const jinshuList:string[] = []
-  Object.keys(data[0]).forEach((v)=>{
-    if(!["国・地域(人)","地域コード", "地域階層" ,"女","男"].includes(v)){
-      jinshuList.push(v)
-    }
-  })
+  const jinshuList: string[] = data.length > 0 ? 
+    Object.keys(data[0]).filter(v => 
+      !["国・地域(人)","地域コード", "地域階層" ,"女","男"].includes(v)
+    ) : [];
 
   console.log(data)
 
@@ -112,6 +114,72 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
     setSelectedInfo(null); // 選択をリセット
   }, []);
 
+  // 地図の初期化と境界表示の設定
+  const onMapLoad = useCallback((mapInstance: google.maps.Map) => {
+    setMap(mapInstance);
+    
+    // 境界表示機能の設定
+    if (showBoundaries) {
+      try {
+        // LOCALITY feature layerを取得（市区町村レベル）
+        const featureLayer = mapInstance.getFeatureLayer(
+          google.maps.FeatureType.LOCALITY
+        );
+        
+        // 境界のスタイルを設定
+        featureLayer.style = (featureStyleFunctionOptions) => {
+          const placeFeature = featureStyleFunctionOptions.feature;
+          
+          // 東京の区の境界を強調表示
+          return {
+            strokeColor: '#FF6B6B',
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: '#FF6B6B',
+            fillOpacity: 0.1,
+          };
+        };
+      } catch (error) {
+        console.warn('境界表示機能の設定に失敗しました:', error);
+        console.warn('Map IDが正しく設定されているか確認してください');
+      }
+    }
+  }, [showBoundaries]);
+
+  // 境界表示の切り替え
+  const toggleBoundaries = useCallback(() => {
+    setShowBoundaries(prev => !prev);
+  }, []);
+
+  // 境界表示の設定を更新
+  useEffect(() => {
+    if (map && isLoaded) {
+      try {
+        const featureLayer = map.getFeatureLayer(
+          google.maps.FeatureType.LOCALITY
+        );
+        
+        if (showBoundaries) {
+          // 境界のスタイルを設定
+          featureLayer.style = (featureStyleFunctionOptions) => {
+            return {
+              strokeColor: '#FF6B6B',
+              strokeOpacity: 0.8,
+              strokeWeight: 2,
+              fillColor: '#FF6B6B',
+              fillOpacity: 0.1,
+            };
+          };
+        } else {
+          // 境界表示を無効化
+          featureLayer.style = null;
+        }
+      } catch (error) {
+        console.warn('境界表示機能の更新に失敗しました:', error);
+      }
+    }
+  }, [map, isLoaded, showBoundaries]);
+
   // ローディング状態
   if (loading) {
     return <LoadingSpinner message="データを読み込み中..." />;
@@ -167,6 +235,20 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
         jinshuList={jinshuList}
       />
 
+      {/* 境界表示切り替えボタン */}
+      <div className="mb-4 flex justify-center">
+        <button
+          onClick={toggleBoundaries}
+          className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            showBoundaries
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+          }`}
+        >
+          {showBoundaries ? '境界表示: ON' : '境界表示: OFF'}
+        </button>
+      </div>
+
       {/* 統計情報パネル */}
       {data.length > 0 && (
         <div className="mb-6">
@@ -185,6 +267,7 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
             center={TOKYO_CENTER}
             zoom={zoomLevel}
             options={mapOptions}
+            onLoad={onMapLoad}
           >
             {data.map((row, idx) => {
               const kuName = row['国・地域(人)'];
