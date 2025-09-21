@@ -132,12 +132,14 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
           
           // 東京の区の境界を強調表示
           return {
-            strokeColor: '#FF6B6B',
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: '#FF6B6B',
-            fillOpacity: 0.1,
-          };
+              // 区画の輪郭
+              strokeColor: '#696969',
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+              // 区画の背景色
+              // fillColor: '#808080',
+              // fillOpacity: 0.1,
+            };
         };
       } catch (error) {
         console.warn('境界表示機能の設定に失敗しました:', error);
@@ -163,11 +165,13 @@ export default function GoogleMapComponent({ initialData = [] }: GoogleMapCompon
           // 境界のスタイルを設定
           featureLayer.style = (featureStyleFunctionOptions) => {
             return {
-              strokeColor: '#FF6B6B',
-              strokeOpacity: 0.8,
+              // 区画の輪郭
+              strokeColor: '#696969',
+              strokeOpacity: 1.0,
               strokeWeight: 2,
-              fillColor: '#FF6B6B',
-              fillOpacity: 0.1,
+              // 区画の背景色
+              // fillColor: '#808080',
+              // fillOpacity: 0.1,
             };
           };
         } else {
